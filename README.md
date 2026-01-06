@@ -109,6 +109,51 @@ except GammaAPIError as e:
     print(f"API Error ({e.status_code}): {e}")
 ```
 
+## API Reference
+
+### GammaClient (Main)
+- `await client.get_status()`: Check the API health status. Returns "OK" if healthy.
+- `await client.search(query: str, **params)`: Search for markets, events, and other entities.
+- `await client.resolve_url(url: str)`: Resolve a Polymarket web URL (market or event) to an SDK object.
+
+### Markets (`client.markets`)
+- `await client.markets.list(**params)`: List markets with optional filters (active, limit, offset, etc.).
+- `await client.markets.get_by_id(market_id: str)`: Get a specific market by its ID.
+- `await client.markets.get_tags(market_id: str)`: Get tags associated with a market.
+- `await client.markets.get_by_slug(slug: str)`: Get a specific market by its URL slug.
+
+### Events (`client.events`)
+- `await client.events.list(**params)`: List events with optional filters.
+- `await client.events.get_by_id(event_id: str)`: Get a specific event by its ID.
+- `await client.events.get_tags(event_id: str)`: Get tags associated with an event.
+- `await client.events.get_by_slug(slug: str)`: Get a specific event by its URL slug.
+
+### Tags (`client.tags`)
+- `await client.tags.list(**params)`: List available tags.
+- `await client.tags.get_by_id(tag_id: str)`: Get a specific tag by its ID.
+- `await client.tags.get_by_slug(slug: str)`: Get a specific tag by its URL slug.
+- `await client.tags.get_related_by_id(tag_id: str)`: Get raw related tag data by ID.
+- `await client.tags.get_related_by_slug(slug: str)`: Get raw related tag data by slug.
+- `await client.tags.get_tags_related_to_id(tag_id: str)`: Get Tag objects related to a specific tag ID.
+- `await client.tags.get_tags_related_to_slug(slug: str)`: Get Tag objects related to a specific tag slug.
+
+### Sports (`client.sports`)
+- `await client.sports.list_teams(**params)`: List sports teams with optional filters.
+- `await client.sports.get_metadata()`: Get metadata for all available sports.
+- `await client.sports.get_market_types()`: Get valid sports market types.
+
+### Series (`client.series`)
+- `await client.series.list(**params)`: List series.
+- `await client.series.get_by_id(series_id: str)`: Get a specific series by ID.
+
+### Comments (`client.comments`)
+- `await client.comments.list(**params)`: List comments (e.g., query by `parentEntityId`).
+- `await client.comments.get_by_id(comment_id: str)`: Get a specific comment by ID.
+- `await client.comments.get_by_user(address: str)`: Get all comments made by a specific wallet address.
+
+### Profiles (`client.profiles`)
+- `await client.profiles.get_by_address(address: str)`: Get the profile for a specific wallet address.
+
 ## Development & Testing
 
 Run unit tests:
