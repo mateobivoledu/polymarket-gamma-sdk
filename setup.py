@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="polymarket-gamma-sdk",
-    version="1.0.0",
+    version="1.1.0",
     packages=find_packages(),
     install_requires=[
         "httpx>=0.24.0",
@@ -10,7 +10,7 @@ setup(
     ],
     author="Mateo Bivol",
     author_email="mateo.bivol@mail.utoronto.ca",
-    description="Asynchronous Python SDK for Polymarket's Gamma API",
+    description="Python SDK for Polymarket's Gamma API (Sync & Async)",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
     url="https://github.com/mateo-bivol/polymarket-gamma-sdk",

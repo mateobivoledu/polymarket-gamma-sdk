@@ -1,6 +1,6 @@
 # Polymarket Gamma SDK
 
-An asynchronous Python SDK for Polymarket's Gamma API, built with `httpx` and `pydantic`.
+A Python SDK for Polymarket's Gamma API, supporting both **Synchronous** and **Asynchronous** usage. Built with `httpx` and `pydantic`.
 
 > [!IMPORTANT]
 > **Disclaimer**: This is an community-maintained, unofficial SDK. This project is **not** affiliated with, endorsed by, or in any way associated with Polymarket.
@@ -9,7 +9,7 @@ This SDK provides a clean, type-safe interface to interact with Polymarket's mar
 
 ## Features
 
-- **Asynchronous**: Built on `httpx` for high-performance non-blocking I/O.
+- **Dual Mode**: Choose between `GammaClient` (Sync) or `AsyncGammaClient` (Async).
 - **Type-Safe**: All responses are parsed into Pydantic v2 models.
 - **Hierarchical Client**: Logically grouped endpoints (e.g., `client.markets`, `client.sports`).
 - **Robust Exception Handling**: Custom exceptions for `404 Not Found`, validation errors, and general API issues.
@@ -39,28 +39,50 @@ Or install the package in editable mode:
 pip install -e .
 ```
 
-## Quick Start
+## Quick Start (Synchronous)
+
+Recommended for scripts, notebooks, and simple integrations.
 
 ```python
-import asyncio
 from py_gamma_sdk import GammaClient
 
-async def main():
-    async with GammaClient() as client:
+def main():
+    with GammaClient() as client:
         # 1. Check API Health
-        status = await client.get_status()
+        status = client.get_status()
         print(f"API Health: {status}")
 
         # 2. Fetch a specific Market
-        market = await client.markets.get_by_slug("will-barron-attend-georgetown")
-        print(f"Question: {market.question}")
-        print(f"Current Odds: {market.outcomes}")
+        market = client.markets.get_by_slug("will-barron-attend-georgetown")
+        if market:
+            print(f"Question: {market.question}")
+            print(f"Current Odds: {market.outcomes}")
 
         # 3. Resolve a Polymarket URL
         url = "https://polymarket.com/market/will-china-blockade-taiwan-by-june-30"
-        obj = await client.resolve_url(url)
+        obj = client.resolve_url(url)
         if obj:
             print(f"Resolved {type(obj).__name__}: {getattr(obj, 'question', getattr(obj, 'title', ''))}")
+
+if __name__ == "__main__":
+    main()
+```
+
+## Quick Start (Asynchronous)
+
+Recommended for high-performance bots or concurrent applications.
+
+```python
+import asyncio
+from py_gamma_sdk import AsyncGammaClient
+
+async def main():
+    async with AsyncGammaClient() as client:
+        status = await client.get_status()
+        print(f"API Health: {status}")
+        
+        markets = await client.markets.list(limit=1)
+        print(f"Fetched {len(markets)} markets")
 
 if __name__ == "__main__":
     asyncio.run(main())
@@ -68,35 +90,37 @@ if __name__ == "__main__":
 
 ## Detailed Usage
 
+Examples below use the Synchronous `client` but apply equally to `AsyncGammaClient` (with `await`).
+
 ### Markets
 ```python
 # List active markets
-markets = await client.markets.list(active=True, limit=10)
+markets = client.markets.list(active=True, limit=10)
 
 # Get market by ID
-market = await client.markets.get_by_id("12345")
+market = client.markets.get_by_id("12345")
 
 # Get tags for a market
-tags = await client.markets.get_tags("12345")
+tags = client.markets.get_tags("12345")
 ```
 
 ### Events
 Events group multiple markets together.
 ```python
 # List events with a specific slug
-events = await client.events.list(slug="fed-decision")
+events = client.events.list(slug="fed-decision")
 
 # Get event by slug
-event = await client.events.get_by_slug("fed-decision-in-january")
+event = client.events.get_by_slug("fed-decision-in-january")
 ```
 
 ### Sports & Teams
 ```python
 # Get all sports metadata (leagues, images, etc.)
-sports = await client.sports.get_metadata()
+sports = client.sports.get_metadata()
 
 # List teams in a specific league
-teams = await client.sports.list_teams(league="NBA")
+teams = client.sports.list_teams(league="NBA")
 ```
 
 ### Error Handling
@@ -105,7 +129,7 @@ The SDK uses a custom exception hierarchy:
 from py_gamma_sdk.exceptions import GammaAPIError, NotFoundError
 
 try:
-    market = await client.markets.get_by_id("invalid-id")
+    market = client.markets.get_by_id("invalid-id")
 except NotFoundError:
     print("Market doesn't exist.")
 except GammaAPIError as e:
@@ -114,10 +138,14 @@ except GammaAPIError as e:
 
 ## API Reference
 
-### GammaClient (Main)
-- `await client.get_status()`: Check the API health status. Returns "OK" if healthy.
-- `await client.search(query: str, **params)`: Search for markets, events, and other entities.
-- `await client.resolve_url(url: str)`: Resolve a Polymarket web URL (market or event) to an SDK object.
+### Clients
+- **`GammaClient`**: Synchronous client.
+- **`AsyncGammaClient`**: Asynchronous client.
+
+### Common Methods
+- `get_status()`: Check the API health status. Returns "OK" if healthy.
+- `search(query: str, **params)`: Search for markets, events, and other entities.
+- `resolve_url(url: str)`: Resolve a Polymarket web URL (market or event) to an SDK object.
 
 ### Markets (`client.markets`)
 - `await client.markets.list(**params)`: List markets with optional filters (active, limit, offset, etc.).

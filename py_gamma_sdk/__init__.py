@@ -1,5 +1,5 @@
-from .client import GammaClient
+from .client import GammaClient, AsyncGammaClient
 from .models import *
 from .exceptions import *
 
-__all__ = ["GammaClient"]
+__all__ = ["GammaClient", "AsyncGammaClient"]
